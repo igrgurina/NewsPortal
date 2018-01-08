@@ -36,6 +36,8 @@ namespace Portal
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();
 
+            services.AddTransient<DataAccess>();
+
             services.AddMvc();
         }
 

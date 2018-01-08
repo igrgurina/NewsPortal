@@ -5,28 +5,42 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Portal.Models;
+using MongoDB.Bson;
 
 namespace Portal.Controllers
 {
     public class HomeController : Controller
     {
+        DataAccess context;
+
+        public HomeController()
+        {
+            context = new DataAccess();
+        }
+
         public IActionResult Index()
         {
-            return View();
+            return View(context.GetNLatestArticles().ToList());
         }
 
-        public IActionResult About()
+        [HttpGet]
+        public IActionResult Comment()
         {
-            ViewData["Message"] = "Your application description page.";
-
-            return View();
+            return PartialView("_CommentPartial");
         }
 
-        public IActionResult Contact()
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Comment([Bind("Id,Content,ArticleId")] Comment item)
         {
-            ViewData["Message"] = "Your contact page.";
+            if (ModelState.IsValid)
+            {
+                context.AddCommentToArticle(item);
 
-            return View();
+                return RedirectToAction(nameof(Index));
+            }
+
+            return PartialView("_CommentPartial");
         }
 
         public IActionResult Error()
