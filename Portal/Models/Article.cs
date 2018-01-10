@@ -57,6 +57,15 @@ namespace Portal.Models
         public ObjectId ArticleId { get; set; }
     }
 
+    public class CommentViewModel
+    {
+        public string Comment { get; set; }
+        public string ArticleId { get; set; }
+
+        public CommentViewModel()
+        { }
+    }
+
     public class ArticleViewModel
     {
         public string Title { get; set; }
@@ -128,7 +137,7 @@ namespace Portal.Models
 
         public Comment AddCommentToArticle(Comment comment)
         {
-            var update = Builders<Article>.Update.AddToSet(article => article.Comments, comment);
+            var update = Builders<Article>.Update.Push(article => article.Comments, comment);
             collection.FindOneAndUpdate(article => article.Id == comment.ArticleId, update);
 
             return comment;

@@ -1,13 +1,15 @@
 @using MongoDB.Bson
-@model Portal.Models.Comment
+@model Portal.Models.CommentViewModel
+@{
+    Model.ArticleId = ViewData["articleID"].ToString();
+}
 
-<form asp-area="" asp-controller="Home" asp-action="Comment" method="post" id="commentForm">
-    <input type="hidden" asp-for="Id" />
+<form asp-area="" asp-controller="Home" asp-action="Comment" method="post" id="commentForm_@Model.ArticleId">
     <input type="hidden" asp-for="ArticleId" />
     <div class="input-group">
-        <input asp-for="Content" type="text" class="form-control" placeholder="Comment...">
+        <input asp-for="Comment" type="text" class="form-control" placeholder="Comment...">
+        <span class="input-group-btn">
+            <input type="submit" value="Add" class="btn btn-secondary" />
+        </span>
     </div>
-    <span class="input-group-btn">
-        <input type="submit" value="Add" class="btn btn-secondary" />
-    </span>
 </form>

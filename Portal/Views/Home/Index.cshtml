@@ -1,4 +1,5 @@
-﻿@model List<Portal.Models.Article>
+﻿@using MongoDB.Bson
+@model List<Portal.Models.Article>
 @{
     ViewData["Title"] = "News Portal - Ivan Grgurina";
 }
@@ -37,7 +38,7 @@
                                 </li>
                             }
                         </ul>
-                        @Html.Partial("_CommentPartial", new Comment() { ArticleId = item.Id })
+                        @Html.Partial("_CommentPartial", new CommentViewModel { ArticleId = item.Id.ToString(), Comment = "" }, new ViewDataDictionary(this.ViewData) { new KeyValuePair<string, object>("articleID", item.Id) })
 
 
                     </div>

@@ -23,24 +23,29 @@ namespace Portal.Controllers
             return View(context.GetNLatestArticles().ToList());
         }
 
-        [HttpGet]
-        public IActionResult Comment()
-        {
-            return PartialView("_CommentPartial");
-        }
+        //[HttpGet]
+        //public IActionResult Comment()
+        //{
+        //    return PartialView("_CommentPartial");
+        //}
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Comment([Bind("Id,Content,ArticleId")] Comment item)
+        public IActionResult Comment([FromForm] CommentViewModel item)
         {
+            var comment = new Comment()
+            {
+                ArticleId = ObjectId.Parse(item.ArticleId),
+                Content = item.Comment
+            };
+
+            //item.ArticleId = ObjectId.Parse(item.ArticleId);
             if (ModelState.IsValid)
             {
-                context.AddCommentToArticle(item);
-
-                return RedirectToAction(nameof(Index));
+                context.AddCommentToArticle(comment);
             }
 
-            return PartialView("_CommentPartial");
+            return RedirectToAction(nameof(Index));
         }
 
         public IActionResult Error()
