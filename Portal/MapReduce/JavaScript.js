@@ -54,17 +54,20 @@ db.word_count.mapReduce(mapper, reducer, "top_author_words");
 
 
 // some kind of "comments" - { content, articleId }
-var artcommap = function () {
-    emit(this.ArticleId, 1);
-}
+var artcommap = function() {
+    this.Comments.forEach(
+        function(comment) {
+            emit(this.Title, 1);
+        });
+};
 
-var artcomreduce = function (key, values) {
+var artcomreduce = function(key, values) {
     return Array.sum(values);
-}
+};
 
-var artcomfinalize = function (key, values) {
+var artcomfinalize = function(key, values) {
     return values.sort((a, b) => b - a);
-}
+};
 
 db.comments.mapReduce(artcommap, artcomreduce, { out: "article_comments_rank", finalize: artcomfinalize });
 
