@@ -159,6 +159,62 @@ namespace Portal.Models
             //var res = Query<Article>.EQ(e => e.Id, id);
             //var operation = _db.GetCollection<Article>(ARTICLE_COLLECTION_NAME).Remove(res);
         }
+
+
+
+        #region MAP REDUCE
+        public void MapReduce()
+        {
+            var collection = _db.GetCollection<Article>("articles");
+
+            var options = new MapReduceOptions<Article, int>
+            {
+                Finalize = finalize,
+                OutputOptions = MapReduceOutputOptions.Inline
+            };
+
+            var results = collection.MapReduce(map, reduce, options);
+
+            foreach (var result in results.ToEnumerable())
+            {
+                Console.WriteLine(result.ToJson());
+            }
+        }
+
+        private string map = @"
+            function() {
+                var movie = this;
+                emit(movie.Category, { count: 1, totalMinutes: movie.Minutes }); 
+            }";
+
+        // emit: key = how we want to group the values (by category)
+        //      value = object containing the count of movies (always 1) 
+        //              and total length of each individual movie
+
+        // mongo groups the items you emit and pass them as an array to the reduce function you provide
+        private string reduce = @"
+            function(key, values) {
+                var result = { count: 0, totalMinutes: 0};
+
+                values.forEach(function(value) {
+                    result.count += value.count;
+                    result.totalMinutes += value.totalMinutes;
+                });
+
+                return result;
+            }";
+
+        // reduce function returns single result
+        // return value must have the same shape as the emitted values!
+
+        // finalize is optional, but you can perform some final calculation
+        // based on fully reduced set of data --- calculate the average length of all movies in a category
+        private string finalize = @"
+            function(key, value) {
+                value.average = value.totalMinutes / value.count;
+                return value;
+            }";
+        #endregion
     }
 
 
@@ -229,6 +285,63 @@ namespace Portal.Models
             return Create(Directory.GetCurrentDirectory(), Environment.GetEnvironmentVariable("Hosting:Environment"));
             //return Create(options.ContentRootPath, options.EnvironmentName);
         }
+    }
+
+    public class PortalMR
+    {
+        private string map = @"
+            function() {
+                var movie = this;
+                emit(movie.Category, { count: 1, totalMinutes: movie.Minutes }); 
+            }";
+
+        // emit: key = how we want to group the values (by category)
+        //      value = object containing the count of movies (always 1) 
+        //              and total length of each individual movie
+
+        // mongo groups the items you emit and pass them as an array to the reduce function you provide
+        private string reduce = @"
+            function(key, values) {
+                var result = { count: 0, totalMinutes: 0};
+
+                values.forEach(function(value) {
+                    result.count += value.count;
+                    result.totalMinutes += value.totalMinutes;
+                });
+
+                return result;
+            }";
+
+        // reduce function returns single result
+        // return value must have the same shape as the emitted values!
+
+        // finalize is optional, but you can perform some final calculation
+        // based on fully reduced set of data --- calculate the average length of all movies in a category
+        private string finalize = @"
+            function(key, value) {
+                value.average = value.totalMinutes / value.count;
+                return value;
+            }";
+
+        //IMongoDatabase _db;
+
+        //public void MapReduce()
+        //{
+        //    var collection = _db.GetCollection<Article>("articles");
+
+        //    var options = new MapReduceOptions<Article, int>
+        //    {
+        //        Finalize = finalize,
+        //        OutputOptions = MapReduceOutputOptions.Inline
+        //    };
+
+        //    var results = collection.MapReduce(map, reduce, options);
+
+        //    foreach (var result in results.ToEnumerable())
+        //    {
+        //        Console.WriteLine(result.ToJson());
+        //    }
+        //}
     }
 
 }
