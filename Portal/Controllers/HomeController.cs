@@ -36,7 +36,8 @@ namespace Portal.Controllers
             var comment = new Comment()
             {
                 ArticleId = ObjectId.Parse(item.ArticleId),
-                Content = item.Comment
+                Content = item.Comment,
+                DateCreated = DateTime.Now
             };
 
             //item.ArticleId = ObjectId.Parse(item.ArticleId);

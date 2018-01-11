@@ -34,7 +34,7 @@
                             @foreach (var comment in item.Comments)
                             {
                                 <li class="list-group-item">
-                                    @Html.Raw(comment.Content)
+                                    <span class="badge badge-pill">@Html.Raw(comment.DateCreated.TimeAgo())</span> @Html.Raw(comment.Content)
                                 </li>
                             }
                         </ul>

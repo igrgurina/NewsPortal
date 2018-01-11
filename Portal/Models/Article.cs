@@ -22,8 +22,8 @@ namespace Portal.Models
     {
         public ObjectId Id { get; set; }
 
-        [BsonElement("ArticleId")]
-        public int ArticleId { get; set; }
+        //[BsonElement("ArticleId")]
+        //public int ArticleId { get; set; }
 
         [BsonElement("Title")]
         public string Title { get; set; }
@@ -53,8 +53,11 @@ namespace Portal.Models
         [BsonElement("Content")]
         public string Content { get; set; }
 
-        [BsonIgnore]
+        [BsonElement("ArticleId")]
         public ObjectId ArticleId { get; set; }
+
+        [BsonElement("_date")]
+        public DateTime DateCreated { get; set; }
     }
 
     public class CommentViewModel
@@ -159,5 +162,52 @@ namespace Portal.Models
             //var res = Query<Article>.EQ(e => e.Id, id);
             //var operation = _db.GetCollection<Article>(ARTICLE_COLLECTION_NAME).Remove(res);
         }
+    }
+}
+
+
+public static class Extensions
+{
+    public static string TimeAgo(this DateTime dt)
+    {
+        TimeSpan span = DateTime.Now - dt;
+        if (span.Days > 365)
+        {
+            int years = (span.Days / 365);
+            if (span.Days % 365 != 0)
+                years += 1;
+            return String.Format("about {0} {1} ago",
+                years, years == 1 ? "year" : "years");
+        }
+        if (span.Days > 30)
+        {
+            int months = (span.Days / 30);
+            if (span.Days % 31 != 0)
+                months += 1;
+            return String.Format("about {0} {1} ago",
+                months, months == 1 ? "month" : "months");
+        }
+        if (span.Days > 1)
+            return String.Format("about {0} days ago",
+                span.Days);
+        
+        if (span.Days == 1)
+        {
+            return String.Format("yesterday");//,
+
+        }
+        if (span.Hours > 3)
+        {
+            return String.Format("today");//,
+
+        }    //span.Hours, span.Hours == 1 ? "hour" : "hours");
+        if (span.Minutes > 0)
+            return String.Format("about {0} {1} ago",
+                span.Minutes, span.Minutes == 1 ? "minute" : "minutes");
+        if (span.Seconds > 5)
+            return String.Format("about {0} seconds ago", span.Seconds);
+        if (span.Seconds <= 5)
+            return "just now";
+        return string.Empty;
     }
 }
